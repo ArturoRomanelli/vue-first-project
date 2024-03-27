@@ -9,18 +9,38 @@ import HelloWorld from './components/HelloWorld.vue'
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
-
       <nav>
         <RouterLink :to="{ name: 'EventList' }">Events</RouterLink>
         <RouterLink :to="{ name: 'About' }">About</RouterLink>
       </nav>
     </div>
   </header>
+  <div>
+    <header id="flashMessage" v-if="Gstore.flashMessage">{{ Gstore.flashMessage }}</header>
 
-  <RouterView />
+    <RouterView />
+  </div>
 </template>
 
+<script>
+export default {
+  inject: ['Gstore']
+}
+</script>
+
 <style scoped>
+@keyframes greenFade {
+  from {
+    background-color: greenyellow;
+  }
+  to {
+    background-color: transparent;
+  }
+}
+#flashMessage {
+  animation-name: greenFade;
+  animation-duration: 3s;
+}
 header {
   line-height: 1.5;
   max-height: 100vh;

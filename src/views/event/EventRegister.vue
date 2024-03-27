@@ -6,9 +6,17 @@
 <script>
 export default {
   props: ['event'],
+  inject: ['Gstore'],
   methods: {
     register() {
-      this.$router.push({ name: 'EventDetails', params: { id: this.event.id } })
+      this.Gstore.flashMessage = 'You are successfully registered for ' + this.event.title
+      setTimeout(() => {
+        this.Gstore.flashMessage = ''
+      }, 3000)
+      this.$router.push({
+        name: 'EventDetails',
+        params: { id: this.event.id }
+      })
     }
   }
 }
