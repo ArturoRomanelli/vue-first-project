@@ -1,12 +1,34 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import EventService from '../services/EventService.js'
-import { watchEffect } from 'vue'
+import EventCard from './EventCard.vue'
 </script>
 
-<script>
-import EventCard from './EventCard.vue'
+<template>
+  <main>
+    <h1>Events for Good</h1>
+    <div class="events">
+      <EventCard v-for="event in events" :key="event.id" :event="event"></EventCard>
 
+      <RouterLink
+        id="page-prev"
+        :to="{ name: 'EventList', query: { page: page - 1 } }"
+        rel="prev"
+        v-if="page != 1"
+        >&#60; Previous Page</RouterLink
+      >
+      <RouterLink
+        id="page-next"
+        :to="{ name: 'EventList', query: { page: page + 1 } }"
+        rel="next"
+        v-if="hasNextPage"
+        >Next Page &#62;</RouterLink
+      >
+    </div>
+  </main>
+</template>
+
+<script>
 export default {
   name: 'EventList',
   props: ['page'],
@@ -19,18 +41,27 @@ export default {
       totalEvents: 0
     }
   },
-  created() {
-    watchEffect(() => {
-      this.events = null
-      EventService.getEvents(2, this.page)
-        .then((response) => {
-          this.events = response.data
-          this.totalEvents = response.headers['x-total-count']
+  beforeRouteEnter(routeTo, _, next) {
+    EventService.getEvents(2, parseInt(routeTo.query.page) || 1)
+      .then((response) => {
+        next((comp) => {
+          comp.events = response.data
+          comp.totalEvents = response.headers['x-total-count']
         })
-        .catch(() => {
-          this.$router.push({ name: 'NetworkError' })
-        })
-    })
+      })
+      .catch(() => {
+        next({ name: 'NetworkError' })
+      })
+  },
+  beforeRouteUpdate(routeTo) {
+    return EventService.getEvents(2, parseInt(routeTo.query.page) || 1)
+      .then((response) => {
+        this.events = response.data
+        this.totalEvents = response.headers['x-total-count']
+      })
+      .catch(() => {
+        return { name: 'NetworkError' }
+      })
   },
   computed: {
     hasNextPage() {
@@ -40,28 +71,6 @@ export default {
   }
 }
 </script>
-
-<template>
-  <main>
-    <h1>Events for Good</h1>
-    <div class="events"></div>
-    <EventCard v-for="event in events" :key="event.id" :event="event"></EventCard>
-    <RouterLink
-      id="page-prev"
-      :to="{ name: 'EventList', query: { page: page - 1 } }"
-      rel="prev"
-      v-if="page != 1"
-      >&#60; Previous Page</RouterLink
-    >
-    <RouterLink
-      id="page-next"
-      :to="{ name: 'EventList', query: { page: page + 1 } }"
-      rel="next"
-      v-if="hasNextPage"
-      >Next Page &#62;</RouterLink
-    >
-  </main>
-</template>
 
 <style scoped>
 .events {
