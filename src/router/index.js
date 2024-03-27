@@ -7,6 +7,7 @@ import EventDetails from '@/views/event/EventDetails.vue'
 import EventRegister from '@/views/event/EventRegister.vue'
 import EventEdit from '@/views/event/EventEdit.vue'
 import NotFound from '@/views/NotFound.vue'
+import NetworkError from '@/views/NetworkError.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,13 +32,11 @@ const router = createRouter({
         {
           path: 'register',
           name: 'EventRegister',
-
           component: EventRegister
         },
         {
           path: 'edit',
           name: 'EventEdit',
-
           component: EventEdit
         }
       ]
@@ -55,6 +54,7 @@ const router = createRouter({
     },
     { path: '/:catchAll(.*)', name: 'NotFound', component: NotFound },
     { path: '/404/:resource', name: '404Resource', component: NotFound, props: true },
+    { path: '/networkError', name: 'NetworkError', component: NetworkError }
   ]
 })
 
